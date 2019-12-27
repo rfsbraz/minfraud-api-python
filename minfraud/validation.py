@@ -44,18 +44,17 @@ _custom_input_value = Any(
     All(_any_string, Match(r'^[^\n]{1,255}\Z')),
     All(
         _any_number,
-        Range(
-            min=-(1 << 53),
-            max=1 << 53,
-            min_included=False,
-            max_included=False)), bool)
+        Range(min=-1e13,
+              max=1e13,
+              min_included=False,
+              max_included=False)), bool)
 
 _md5 = All(_any_string, Match(r'^[0-9A-Fa-f]{32}$'))
 
 _country_code = All(_any_string, Match(r'^[A-Z]{2}$'))
 
-_telephone_country_code = Any(
-    All(_any_string, Match('^[0-9]{1,4}$')), All(int, Range(min=1, max=9999)))
+_telephone_country_code = Any(All(_any_string, Match('^[0-9]{1,4}$')),
+                              All(int, Range(min=1, max=9999)))
 
 _subdivision_iso_code = All(_any_string, Match(r'^[0-9A-Z]{1,4}$'))
 
@@ -106,6 +105,8 @@ _shipping_address['delivery_speed'] = _delivery_speed
 
 _payment_processor = In([
     'adyen',
+    'affirm',
+    'afterpay',
     'altapay',
     'amazon_payments',
     'american_express_payment_gateway',
@@ -118,6 +119,7 @@ _payment_processor = In([
     'braintree',
     'ccavenue',
     'ccnow',
+    'cetelem',
     'chase_paymentech',
     'checkout_com',
     'cielo',
@@ -132,11 +134,13 @@ _payment_processor = In([
     'cybersource',
     'dalenys',
     'dalpay',
-    'datacash'
+    'datacash',
     'dibs',
     'digital_river',
+    'dotpay',
     'ebs',
     'ecomm365',
+    'ecommpay',
     'elavon',
     'emerchantpay',
     'epay',
@@ -144,17 +148,21 @@ _payment_processor = In([
     'eway',
     'exact',
     'first_data',
+    'g2a_pay',
     'global_payments',
     'gocardless',
     'heartland',
     'hipay',
     'ingenico',
+    'interac',
     'internetsecure',
     'intuit_quickbooks_payments',
     'iugu',
+    'klarna',
     'lemon_way',
     'mastercard_payment_gateway',
     'mercadopago',
+    'mercanet',
     'merchant_esolutions',
     'mirjeh',
     'mollie',
@@ -170,11 +178,13 @@ _payment_processor = In([
     'payeezy',
     'payfast',
     'paygate',
+    'paylike',
     'payment_express',
     'paymentwall',
     'payone',
     'paypal',
     'payplus',
+    'paysafecard',
     'paystation',
     'paytrace',
     'paytrail',
@@ -261,66 +271,67 @@ def _uri(s):
     raise ValueError
 
 
-validate_transaction = Schema({
-    'account': {
-        'user_id': _unicode_or_printable_ascii,
-        'username_md5': _md5,
-    },
-    'billing':
-    _address,
-    'payment': {
-        'processor': _payment_processor,
-        'was_authorized': bool,
-        'decline_code': _unicode_or_printable_ascii,
-    },
-    'credit_card': {
-        'avs_result': _single_char,
-        'bank_name': _unicode_or_printable_ascii,
-        'bank_phone_country_code': _telephone_country_code,
-        'bank_phone_number': _unicode_or_printable_ascii,
-        'cvv_result': _single_char,
-        'issuer_id_number': _iin,
-        'last_4_digits': _credit_card_last_4,
-        'token': _credit_card_token,
-    },
-    'custom_inputs': {
-        _custom_input_key: _custom_input_value
-    },
-    Required('device'): {
-        'accept_language': _unicode_or_printable_ascii,
-        Required('ip_address'): _ip_address,
-        'session_age': All(_any_number, Range(min=0)),
-        'session_id': _unicode_or_printable_ascii,
-        'user_agent': _unicode_or_printable_ascii,
-    },
-    'email': {
-        'address': _email_or_md5,
-        'domain': _hostname,
-    },
-    'event': {
-        'shop_id': _unicode_or_printable_ascii,
-        'time': _rfc3339_datetime,
-        'type': _event_type,
-        'transaction_id': _unicode_or_printable_ascii,
-    },
-    'order': {
-        'affiliate_id': _unicode_or_printable_ascii,
-        'amount': _price,
-        'currency': _currency_code,
-        'discount_code': _unicode_or_printable_ascii,
-        'has_gift_message': bool,
-        'is_gift': bool,
-        'referrer_uri': _uri,
-        'subaffiliate_id': _unicode_or_printable_ascii,
-    },
-    'shipping':
-    _shipping_address,
-    'shopping_cart': [
-        {
-            'category': _unicode_or_printable_ascii,
-            'item_id': _unicode_or_printable_ascii,
-            'price': _price,
-            'quantity': All(int, Range(min=1)),
+validate_transaction = Schema(
+    {
+        'account': {
+            'user_id': _unicode_or_printable_ascii,
+            'username_md5': _md5,
         },
-    ],
-}, )
+        'billing':
+        _address,
+        'payment': {
+            'processor': _payment_processor,
+            'was_authorized': bool,
+            'decline_code': _unicode_or_printable_ascii,
+        },
+        'credit_card': {
+            'avs_result': _single_char,
+            'bank_name': _unicode_or_printable_ascii,
+            'bank_phone_country_code': _telephone_country_code,
+            'bank_phone_number': _unicode_or_printable_ascii,
+            'cvv_result': _single_char,
+            'issuer_id_number': _iin,
+            'last_4_digits': _credit_card_last_4,
+            'token': _credit_card_token,
+        },
+        'custom_inputs': {
+            _custom_input_key: _custom_input_value
+        },
+        Required('device'): {
+            'accept_language': _unicode_or_printable_ascii,
+            Required('ip_address'): _ip_address,
+            'session_age': All(_any_number, Range(min=0)),
+            'session_id': _unicode_or_printable_ascii,
+            'user_agent': _unicode_or_printable_ascii,
+        },
+        'email': {
+            'address': _email_or_md5,
+            'domain': _hostname,
+        },
+        'event': {
+            'shop_id': _unicode_or_printable_ascii,
+            'time': _rfc3339_datetime,
+            'type': _event_type,
+            'transaction_id': _unicode_or_printable_ascii,
+        },
+        'order': {
+            'affiliate_id': _unicode_or_printable_ascii,
+            'amount': _price,
+            'currency': _currency_code,
+            'discount_code': _unicode_or_printable_ascii,
+            'has_gift_message': bool,
+            'is_gift': bool,
+            'referrer_uri': _uri,
+            'subaffiliate_id': _unicode_or_printable_ascii,
+        },
+        'shipping':
+        _shipping_address,
+        'shopping_cart': [
+            {
+                'category': _unicode_or_printable_ascii,
+                'item_id': _unicode_or_printable_ascii,
+                'price': _price,
+                'quantity': All(int, Range(min=1)),
+            },
+        ],
+    }, )

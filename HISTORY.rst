@@ -3,16 +3,35 @@
 History
 -------
 
-1.8.0
+1.8.0 (2019-12-20)
 ++++++++++++++++++
 
+* The client-side validation for numeric custom inputs has been updated to
+  match the server-side validation. The valid range is -9,999,999,999,999
+  to 9,999,999,999,999. Previously, larger numbers were allowed.
+* Python 3.3 and 3.4 are no longer supported.
 * Added the following new values to the ``/payment/processor`` validation:
+  * ``affirm``
+  * ``afterpay``
+  * ``cetelem``
   * ``datacash``
+  * ``dotpay``
+  * ``ecommpay``
+  * ``g2a_pay``
   * ``gocardless``
+  * ``interac``
+  * ``klarna``
+  * ``mercanet``
   * ``payeezy``
+  * ``paylike``
   * ``payment_express``
+  * ``paysafecard``
   * ``smartdebit``
   * ``synapsefi``
+* Deprecated the ``email_tenure`` and ``ip_tenure`` attributes of
+  ``minfraud.models.Subscores``.
+* Deprecated the ``is_high_risk`` attribute of
+  ``minfraud.models.GeoIP2Country``.
 
 1.7.0 (2018-04-10)
 ++++++++++++++++++

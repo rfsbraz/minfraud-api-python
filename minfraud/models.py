@@ -84,8 +84,10 @@ class GeoIP2Location(geoip2.records.Location):
     """
 
     __doc__ += geoip2.records.Location.__doc__
-    _valid_attributes = geoip2.records.Location._valid_attributes.union(
-        set(['local_time']))
+
+    def __init__(self, *args, **kwargs):
+        self.local_time = kwargs.get('local_time', None)
+        super(GeoIP2Location, self).__init__(*args, **kwargs)
 
 
 class GeoIP2Country(geoip2.records.Country):
@@ -100,14 +102,18 @@ class GeoIP2Country(geoip2.records.Country):
 
       :type: bool | None
 
+      .. deprecated:: 1.8.0
+        Deprecated effective August 29, 2019.
 
     Parent:
 
     """
 
     __doc__ += geoip2.records.Country.__doc__
-    _valid_attributes = geoip2.records.Country._valid_attributes.union(
-        set(['is_high_risk']))
+
+    def __init__(self, *args, **kwargs):
+        self.is_high_risk = kwargs.get('is_high_risk', False)
+        super(GeoIP2Country, self).__init__(*args, **kwargs)
 
 
 class IPAddress(geoip2.models.Insights):
@@ -179,7 +185,6 @@ class IPAddress(geoip2.models.Insights):
       Object with the traits of the requested IP address.
 
     """
-
     def __init__(self, ip_address):
         if ip_address is None:
             ip_address = {}
@@ -709,12 +714,28 @@ class Subscores(object):
 
       :type: float | None
 
+      .. deprecated:: 1.8.0
+        Deprecated effective August 29, 2019. This subscore will default to 1
+        and will be removed in a future release. The user tenure on email is
+        reflected in the email address subscore output.
+
+      .. seealso::
+        :py:attr:`minfraud.models.Subscores.email_address`
+
     .. attribute:: ip_tenure
 
       The risk associated with the issuer ID number on the IP address. If
       present, this is a value in the range 0.01 to 99.
 
       :type: float | None
+
+      .. deprecated:: 1.8.0
+        Deprecated effective August 29, 2019. This subscore will default to 1
+        and will be removed in a future release. The IP tenure is reflected in
+        the overall risk score.
+
+      .. seealso::
+        :py:attr:`minfraud.models.Score.risk_score`
 
     .. attribute:: issuer_id_number
 

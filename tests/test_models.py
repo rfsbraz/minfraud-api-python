@@ -17,8 +17,6 @@ class TestModels(unittest.TestCase):
         """This tests some level of _shallow_ immutability for these classes"""
         T = namedtuple('T', ['obj', 'attr'])
         models = [
-            T(GeoIP2Country(), 'iso_code'),
-            T(GeoIP2Location(), 'latitude'),
             T(Issuer(), 'name'),
             T(CreditCard(), 'country'),
             T(Device(), 'id'),
@@ -32,9 +30,9 @@ class TestModels(unittest.TestCase):
         ]
         for model in models:
             for attr in (model.attr, 'does_not_exist'):
-                with self.assertRaises(
-                        AttributeError, msg='{0!s} - {0}'.format(
-                            model.obj, attr)):
+                with self.assertRaises(AttributeError,
+                                       msg='{0!s} - {0}'.format(
+                                           model.obj, attr)):
                     setattr(model.obj, attr, 5)
 
     def test_billing_address(self):
